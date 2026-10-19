@@ -146,7 +146,7 @@ uvicorn app.main:app --reload
 - [🗸] Integração com WeasyPrint (Template HTML/CSS).
 - [🗸] Página de validação pública via QR Code.
 - [🗸] Disparo de e-mail com anexo (testado via Mailtrap).
-- [ ] Criação de interface web (`/admin`) para facilitar o uso da equipe.
+- [🗸] Criação de interface web (`/admin`) para facilitar o uso da equipe.
 - [ ] Deploy em nuvem (Render/Railway).
 - [ ] Integração direta com API do Google Sheets.
 
