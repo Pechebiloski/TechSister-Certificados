@@ -27,7 +27,6 @@ class CertificadoRequest(BaseModel):
     carga_horaria: int
 
 
-# --- ROTA 3: VALIDAÇÃO PÚBLICA ---
 @app.get("/validar/{token}", response_class=HTMLResponse)
 def validar_certificado(token: str, db: Session = Depends(get_db)):
     
