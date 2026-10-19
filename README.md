@@ -91,8 +91,8 @@ tech-sisters-certificados/
 **1. Clone o repositório:**
 
 ```bash
-git clone https://github.com/seu-usuario/tech-sisters-certificados.git
-cd tech-sisters-certificados
+git clone https://github.com/seu-usuario/TechSister-Certificados.git
+cd TechSister-Certificados
 ```
 
 **2. Crie e ative um ambiente virtual:**
