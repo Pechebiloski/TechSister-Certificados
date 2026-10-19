@@ -8,11 +8,11 @@ from pydantic import BaseModel
 import urllib.parse
 import pandas as pd
 import zipfile
+import os
 
 from app.database import engine, get_db
 from app import models
-from app.utils import gerar_token_seguro, gerar_qr_code_base64
-
+from app.utils import gerar_token_seguro, gerar_qr_code_base64, enviar_email_certificado
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -20,35 +20,23 @@ app = FastAPI(title="Tech Sisters Certificados API")
 
 env = Environment(loader=FileSystemLoader("templates"))
 
+BASE_URL_VALIDACAO = os.getenv("BASE_URL_VALIDACAO", "https://techsisters.com.br")
+
 class CertificadoRequest(BaseModel):
     nome_participante: str
     email_participante: str
     evento: str
     carga_horaria: int
 
-
-@app.get("/validar/{token}", response_class=HTMLResponse)
-def validar_certificado(token: str, db: Session = Depends(get_db)):
-    
-    token_limpo = token.strip() 
-    
-    certificado = db.query(models.Certificado).filter(models.Certificado.token == token_limpo).first()
-    
-    template = env.get_template("validacao.html")
-    
-    if certificado:
-        html_content = template.render(valido=True, certificado=certificado)
-    else:
-        html_content = template.render(valido=False)
-        
-    return HTMLResponse(content=html_content)
-
+@app.get("/")
+def read_root():
+    return {"status": "Online", "message": "API de Certificados Tech Sisters rodando!"}
 
 @app.post("/gerar-certificado-teste")
 def gerar_certificado_teste(dados: CertificadoRequest, db: Session = Depends(get_db)):
     try:
         token = gerar_token_seguro(dados.evento, dados.email_participante)
-        url_validacao = f"https://techsisters.com.br/validar/{token}"
+        url_validacao = f"{BASE_URL_VALIDACAO}/validar/{token}"
         qr_base64 = gerar_qr_code_base64(url_validacao)
 
         template = env.get_template("certificado.html")
@@ -82,7 +70,7 @@ def gerar_certificado_teste(dados: CertificadoRequest, db: Session = Depends(get
     except Exception as e:
         db.rollback()
         return {"erro": str(e)}
-
+    
 @app.post("/gerar-certificados-em-massa")
 def gerar_certificados_em_massa(
     arquivo_csv: UploadFile = File(...), 
@@ -100,7 +88,7 @@ def gerar_certificados_em_massa(
                 email = row['email_participante']
                 
                 token = gerar_token_seguro(evento, email)
-                url_validacao = f"https://techsisters.com.br/validar/{token}"
+                url_validacao = f"{BASE_URL_VALIDACAO}/validar/{token}"
                 qr_base64 = gerar_qr_code_base64(url_validacao)
 
                 template = env.get_template("certificado.html")
@@ -113,6 +101,16 @@ def gerar_certificados_em_massa(
                 )
 
                 pdf_bytes = HTML(string=html_renderizado).write_pdf()
+
+                try:
+                    enviar_email_certificado(
+                        destinatario=email, 
+                        nome=nome, 
+                        evento=evento, 
+                        pdf_bytes=pdf_bytes
+                    )
+                except Exception as email_error:
+                    print(f"Erro ao enviar email para {email}: {email_error}")
 
                 novo_certificado = models.Certificado(
                     token=token,
@@ -140,9 +138,13 @@ def gerar_certificados_em_massa(
         db.rollback()
         return {"erro": str(e)}
 
+
 @app.get("/validar/{token}", response_class=HTMLResponse)
 def validar_certificado(token: str, db: Session = Depends(get_db)):
-    certificado = db.query(models.Certificado).filter(models.Certificado.token == token).first()
+
+    token_limpo = token.strip() 
+    
+    certificado = db.query(models.Certificado).filter(models.Certificado.token == token_limpo).first()
     
     template = env.get_template("validacao.html")
     
