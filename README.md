@@ -1,159 +1,110 @@
- <div align="center">
+# Tech Sisters - Automação de Certificados
 
-# ♡ Tech Sisters — Automação de Certificados
+Uma solução completa em Python para automatizar a emissão, o envio, a validação e o gerenciamento de certificados dos eventos da comunidade Tech Sisters.
 
-**«Uma solução em Python para automatizar a emissão, o envio e a validação de certificados dos eventos da comunidade Tech Sisters.»**
-
-[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-pink?style=for-the-badge)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-
-*Tecnologia para simplificar processos e fortalecer comunidades.*
-
-</div>
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white)
+![Status](https://img.shields.io/badge/Status-MVP_Concluído-pink?style=for-the-badge)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
 
 ---
 
-### 🎀 "01" · Sobre o projeto
+## Demonstração do Sistema
 
-O **Tech Sisters — Automação de Certificados** é um projeto voltado à modernização do fluxo de emissão de certificados da comunidade, reduzindo tarefas manuais e tornando o processo mais eficiente, consistente e seguro.
+Aqui estão algumas capturas de tela do sistema em funcionamento:
 
-Atualmente, a emissão depende de ajustes manuais em modelos de documentos, o que dificulta a manutenção da identidade visual e aumenta o tempo necessário para atender às participantes.
+| Painel Administrativo | Dashboard de Gerenciamento |
+| :---: | :---: |
+| <img src="assets/admin.png" width="400" alt="Tela de Admin"> | <img src="assets/dashboard.png" width="400" alt="Dashboard"> |
+| *Interface amigável para upload de CSV e configuração do evento.* | *Painel com busca, edição rápida e revogação de certificados.* |
 
-A proposta é disponibilizar uma API capaz de centralizar esse processo, desde a geração dos documentos até a verificação de autenticidade.
+| Certificado Gerado (PDF) | Página Pública de Validação |
+| :---: | :---: |
+| <img src="assets/certificado.png" width="400" alt="Certificado PDF"> | <img src="assets/validacao.png" width="400" alt="Tela de Validação"> |
+| *Certificado gerado dinamicamente com QR Code de autenticidade.* | *Validação pública com mascaramento de dados (LGPD).* |
 
-### 🧩 "02" · O problema
+*(Nota: substitua os caminhos `assets/imagem.png` se você colocar as imagens em outra pasta).*
 
-O fluxo atual apresenta alguns desafios:
+---
 
-- **Processos manuais:** Tempo excessivo dedicado à edição e emissão dos certificados.
-- **Manutenção visual:** Dificuldade para atualizar os documentos quando a identidade visual da comunidade muda.
-- **Escalabilidade:** Limitações para gerar certificados em grandes quantidades.
-- **Autenticidade:** Ausência de um mecanismo integrado para verificar a validade dos documentos.
+## "01" - Sobre o projeto
 
-### 💡 "03" · A solução
+O **Tech Sisters - Automação de Certificados** moderniza o fluxo de emissão de certificados da comunidade, reduzindo tarefas manuais e garantindo segurança na validação. 
 
-Uma API desenvolvida em Python para automatizar as principais etapas do processo.
+O sistema resolve gargalos operacionais, como a emissão em lote, a padronização visual flexível (permitindo mudar o layout sem alterar o código) e a proteção dos dados das participantes.
 
-| Funcionalidade | Descrição |
-| :--- | :--- |
-| **Templates flexíveis** | Certificados gerados a partir de HTML e CSS, facilitando a manutenção visual. |
-| **Geração em lote** | Leitura de listas de presença em CSV e geração automatizada de PDFs. |
-| **Validação individual** | Identificador único (Hash SHA-256) para cada certificado, com suporte a QR Codes. |
-| **Verificação pública** | Endpoint para consultar a autenticidade de um certificado. |
-| **Envio automatizado** | Disparo de certificados por e-mail com documentos anexados. |
+## "02" - Funcionalidades Principais
 
-> ♡ *A arquitetura busca manter a lógica de negócio independente da apresentação visual, facilitando futuras atualizações e melhorias.*
+- **Geração em Lote:** Leitura de planilhas (CSV) do Google Forms e geração automatizada de PDFs.
+- **Design Flexível:** Templates em HTML/CSS. O layout inclui um campo dinâmico de "Realização / Parceria", adaptando-se a eventos conjuntos.
+- **Envio Automatizado:** Disparo de e-mails personalizados com o certificado em anexo.
+- **QR Code de Validação:** Cada certificado possui um código único criptográfico.
+- **Painel Administrativo (`/admin`):** Interface protegida por senha para emissão em massa.
+- **Dashboard (`/dashboard`):** Visualização de todos os certificados, com busca por nome/evento, edição em linha (correção de nomes) e revogação de certificados.
+- **Validação Pública:** Página de verificação acessível via QR Code.
 
-### 🛠️ "04" · Tecnologias
+## "03" - Segurança e LGPD
 
-As ferramentas escolhidas para a implementação:
+A arquitetura foi pensada para proteger os dados das participantes:
+
+- **Tokens Criptográficos:** O sistema gera um token aleatório de 256 bits (via `secrets`). O banco de dados armazena apenas o hash SHA-256 desse token, nunca o valor real.
+- **Privacidade (LGPD):** A página pública de validação exibe apenas o primeiro nome e a inicial do sobrenome da participante (ex: "Maria S."), além de omitir dados sensíveis.
+- **Proteção de Rotas:** As rotas de administração e geração utilizam HTTP Basic Auth (usuário e senha configurados via variáveis de ambiente).
+- **Revogação:** Certificados podem ser revogados no dashboard. Se o QR Code for escaneado, a página indicará que o documento é inválido.
+
+## "04" - Tecnologias Utilizadas
 
 | Tecnologia | Aplicação |
 | :--- | :--- |
-| 🐍 **[Python](https://www.python.org/)** | Linguagem principal |
-| ⚡ **[FastAPI](https://fastapi.tiangolo.com/)** | Construção da API |
-| 🎨 **[Jinja2](https://jinja.palletsprojects.com/)** | Renderização de templates HTML |
-| 📄 **[WeasyPrint](https://weasyprint.org/)** | Conversão de HTML/CSS para PDF |
-| 🗄️ **[SQLAlchemy](https://www.sqlalchemy.org/) + [SQLite](https://www.sqlite.org/)** | Mapeamento objeto-relacional e persistência de dados |
-| 🔳 **[qrcode](https://pypi.org/project/qrcode/) + [Pillow](https://pypi.org/project/Pillow/)** | Geração e processamento de QR Codes |
-| 📊 **[Pandas](https://pandas.pydata.org/)** | Leitura e processamento das planilhas CSV |
-| ✉️ **smtplib** | Envio automatizado de e-mails |
-| 🔐 **[python-dotenv](https://pypi.org/project/python-dotenv/)** | Gerenciamento de variáveis de ambiente |
+| **Python** | Linguagem principal do backend. |
+| **FastAPI** | Framework web para construção da API e rotas. |
+| **Jinja2** | Renderização dos templates HTML. |
+| **WeasyPrint** | Conversão de HTML/CSS em PDFs de alta qualidade. |
+| **SQLAlchemy + SQLite** | ORM e banco de dados (pronto para migrar para PostgreSQL em produção). |
+| **qrcode + Pillow** | Geração e processamento dos QR Codes. |
+| **Pandas** | Leitura e tratamento das planilhas CSV. |
+| **smtplib** | Envio de e-mails (com testes realizados via Mailtrap). |
 
-### 📁 "05" · Estrutura do projeto
+## "05" - Como executar o projeto localmente
 
-```text
-tech-sisters-certificados/
-│
-├── app/
-│   ├── main.py          # Rotas da API e interface
-│   ├── database.py      # Configuração do banco de dados
-│   ├── models.py        # Modelos de dados
-│   └── utils.py         # Hashes, QR Codes e envio de e-mail
-│
-├── templates/
-│   ├── certificado.html # Template do certificado
-│   ├── validacao.html   # Página pública de validação
-│   └── admin.html       # Interface para emissão em massa
-│
-├── static/
-│   └── css/             # Estilos dos documentos
-│
-├── .env.example         # Exemplo de configuração
-├── requirements.txt     # Dependências Python
-└── README.md
-```
-
-### 💻 "06" · Como executar o projeto localmente
-
-**1. Clone o repositório:**
-
+1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/TechSister-Certificados.git
-cd TechSister-Certificados
-```
+git clone https://github.com/seu-usuario/tech-sisters-certificados.git
+cd tech-sisters-certificados
+Crie e ative um ambiente virtual:
 
-**2. Crie e ative um ambiente virtual:**
-
-```bash
+bash
 python -m venv venv
-```
+source venv/bin/activate  # Linux/Mac
+# venv\Scripts\activate   # Windows
+Instale as dependências:
 
-Linux/Mac:
-
-```bash
-source venv/bin/activate
-```
-
-Windows:
-
-```bash
-venv\Scripts\activate
-```
-
-**3. Instale as dependências:**
-
-```bash
+bash
 pip install -r requirements.txt
-```
+Instale as dependências do sistema (necessárias para o WeasyPrint no Linux/Codespaces):
 
-**4. Instale as dependências do sistema (necessárias para o WeasyPrint no Linux):**
-
-```bash
+bash
 sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0 libgdk-pixbuf2.0-0
-```
+Configure o .env (use o .env.example como base):
 
-**5. Configure as variáveis de ambiente copiando o arquivo de exemplo:**
-
-```bash
+bash
 cp .env.example .env
-```
+(Preencha as credenciais de SMTP e defina as senhas de administrador).
 
-*Preencha as credenciais de SMTP no arquivo `.env`.*
+Inicie o servidor:
 
-**6. Inicie o servidor:**
-
-```bash
+bash
 uvicorn app.main:app --reload
-```
+Acesse http://127.0.0.1:8000/admin para a interface de emissão.
 
-### 🌷 "07" · Roadmap
-
-- [🗸] Estrutura inicial e modelagem do banco.
-- [🗸] Geração de PDF individual e em massa (ZIP).
-- [🗸] Integração com WeasyPrint (Template HTML/CSS).
-- [🗸] Página de validação pública via QR Code.
-- [🗸] Disparo de e-mail com anexo (testado via Mailtrap).
-- [🗸] Criação de interface web (`/admin`) para facilitar o uso da equipe.
-- [ ] Deploy em nuvem (Render/Railway).
-- [ ] Integração direta com API do Google Sheets.
-
----
-
-<div align="center">
-
-♡ Desenvolvido para a comunidade **Tech Sisters**. ♡
-
-</div>
+"06" - Roadmap
+☑ Estrutura inicial e modelagem do banco de dados.
+☑ Geração de PDF individual e em massa (ZIP).
+☑ Integração com WeasyPrint e design customizado.
+☑ Página de validação pública via QR Code (com LGPD).
+☑ Disparo de e-mail com anexo.
+☑ Implementação de segurança (Hash SHA-256, Basic Auth).
+☑ Dashboard de gerenciamento com busca, edição e revogação.
+□ Deploy em nuvem (Render/Railway) com PostgreSQL.
+□ Integração direta com a API do Google Sheets.
+Desenvolvido com dedicação para a comunidade Tech Sisters.
