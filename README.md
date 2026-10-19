@@ -13,12 +13,12 @@ Uma solução completa em Python para automatizar a emissão, o envio, a valida�
 
 | Painel Administrativo | Dashboard de Gerenciamento |
 | :---: | :---: |
-| <img src="./assets/interface_teste.PNG" width="400" alt="Tela de Admin"> | <img src="./assets/dashboard_edicao.PNG" width="400" alt="Dashboard"> |
+| <img src="./assets/interface_teste.PNG" width="400" alt="Tela de Admin"> | <img src="./assets/dashboard_edição.PNG" width="400" alt="Dashboard"> |
 | *Interface amigável para upload de CSV e configuração do evento.* | *Painel com busca, edição rápida e revogação de certificados.* |
 
 | Certificado Gerado (PDF) | Página Pública de Validação |
 | :---: | :---: |
-| <img src="./assets/teste_certificado.PNG" width="400" alt="Certificado PDF"> | <img src="./assets/resultado_teste.PNG" width="400" alt="Tela de Validação"> |
+| <img src="./assets/teste certificado.PNG" width="400" alt="Certificado PDF"> | <img src="./assets/resultado_teste.PNG" width="400" alt="Tela de Validação"> |
 | *Certificado gerado dinamicamente com QR Code e campo de parceria.* | *Validação pública com mascaramento de dados (LGPD).* |
 
 ---
