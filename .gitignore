@@ -222,4 +222,5 @@ __marimo__/
 .env
 certificados.db
 __pycache__/
+credentials.json
 
