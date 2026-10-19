@@ -8,6 +8,3 @@ sqlalchemy
 python-dotenv
 python-multipart
 pandas
-smtplib
-gspread
-google-auth
