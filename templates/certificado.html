@@ -1,47 +1,76 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-    <head>
-            <meta charset="UTF-8">
-                <style>
-                                    @page { size: A4 landscape; margin: 0; }
-                                            body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #fdf2f8; }
-                                                    .container {
-                                                                    width: 100vw; height: 100vh; box-sizing: border-box;
-                                                                                border: 15px solid #d81b60; padding: 40px;
-                                                                                            display: flex; flex-direction: column; align-items: center; justify-content: center;
-                                                                                                        text-align: center;
-                                                    }
-                                                            h1 { color: #d81b60; font-size: 40px; margin-bottom: 10px; letter-spacing: 2px; }
-                                                                    .subtitulo { font-size: 20px; color: #555; margin-bottom: 30px; }
-                                                                            .nome { font-size: 50px; font-weight: bold; color: #ad1457; margin: 20px 0; font-family: 'Georgia', serif; }
-                                                                                    .texto { font-size: 20px; color: #333; line-height: 1.5; }
-                                                                                            .qr-container { margin-top: 30px; }
-                                                                                                    .rodape { font-size: 12px; color: #777; margin-top: 20px; }
-                                                                                                            .codigo { font-weight: bold; color: #d81b60; }
-                                                </style>
-                                            </head>
-                                            <body>
-                                                    <div class="container">
-                                                                <h1>CERTIFICADO DE PARTICIPAÇÃO</h1>
-                                                                        <p class="subtitulo">Certificamos que</p>
-                                                                                
-                                                                                <div class="nome">{{ nome_participante }}</div>
-                                                                                        
-                                                                                        <p class="texto">
-                                                                                                        participou do evento <strong>{{ evento }}</strong>,<br>
-                                                                                                                    promovido pela Tech Sisters, com carga horária total de <strong>{{ carga_horaria }} horas</strong>.
-                                                                                        </p>
-                                                                                                
-                                                                                                <div class="qr-container">
-                                                                        
-                                                                                                                        <img src="data:image/png;base64,{{ qr_code_base64 }}" width="120" height="120">
-                                                                                                </div>
-                                                                                                    
-                                                                                                    <div class="rodape">
-                                                                                                                    Código de validação: <span class="codigo">{{ token }}</span><br>
-                                                                                                                            Valide em: https://techsisters.com.br/validar/{{ token }}
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </body>
-                                                                                        </html>
-                                                                                     }
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Força o tamanho A4 deitado e remove margens da impressão */
+        @page { 
+            size: A4 landscape; 
+            margin: 0; 
+        }
+        
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #fdf2f8; /* Fundo rosinha claro */
+        }
+        
+        /* Container exato do tamanho da folha A4 deitada */
+        .container {
+            width: 297mm; 
+            height: 210mm; 
+            box-sizing: border-box; /* Garante que a borda não aumente o tamanho */
+            border: 15px solid #d81b60; /* Borda rosa escuro */
+            padding: 20px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            page-break-after: avoid; /* Impede quebra de página */
+        }
+        
+        h1 { color: #d81b60; font-size: 32px; margin: 0 0 10px 0; letter-spacing: 2px; }
+        .subtitulo { font-size: 18px; color: #555; margin: 0 0 20px 0; }
+        .nome { font-size: 42px; font-weight: bold; color: #ad1457; margin: 10px 0; font-family: 'Georgia', serif; }
+        .texto { font-size: 18px; color: #333; line-height: 1.4; margin-bottom: 20px; }
+        
+        .qr-container img { width: 100px; height: 100px; margin-top: 10px; }
+        
+        /* Fixa o rodapé lá embaixo para não empurrar o conteúdo */
+        .rodape { 
+            font-size: 10px; 
+            color: #777; 
+            position: absolute; 
+            bottom: 15px; 
+            width: 90%; 
+            text-align: center; 
+        }
+        .codigo { font-weight: bold; color: #d81b60; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CERTIFICADO DE PARTICIPAÇÃO</h1>
+        <p class="subtitulo">Certificamos que</p>
+        
+        <div class="nome">{{ nome_participante }}</div>
+        
+        <p class="texto">
+            participou do evento <strong>{{ evento }}</strong>,<br>
+            promovido pela Tech Sisters, com carga horária total de <strong>{{ carga_horaria }} horas</strong>.
+        </p>
+        
+        <div class="qr-container">
+            <img src="data:image/png;base64,{{ qr_code_base64 }}">
+        </div>
+        
+        <div class="rodape">
+            Código de validação: <span class="codigo">{{ token }}</span><br>
+            Valide em: https://techsisters.com.br/validar/{{ token }}
+        </div>
+    </div>
+</body>
+</html>
