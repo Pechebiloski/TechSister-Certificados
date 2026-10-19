@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, UploadFile, File, Form
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, HTMLResponse
 from sqlalchemy.orm import Session
 from weasyprint import HTML
 from jinja2 import Environment, FileSystemLoader
@@ -8,11 +8,11 @@ from pydantic import BaseModel
 import urllib.parse
 import pandas as pd
 import zipfile
-import os
 
 from app.database import engine, get_db
 from app import models
 from app.utils import gerar_token_seguro, gerar_qr_code_base64
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -26,9 +26,23 @@ class CertificadoRequest(BaseModel):
     evento: str
     carga_horaria: int
 
-@app.get("/")
-def read_root():
-    return {"status": "Online", "message": "API de Certificados Tech Sisters rodando!"}
+
+# --- ROTA 3: VALIDAÇÃO PÚBLICA ---
+@app.get("/validar/{token}", response_class=HTMLResponse)
+def validar_certificado(token: str, db: Session = Depends(get_db)):
+    
+    token_limpo = token.strip() 
+    
+    certificado = db.query(models.Certificado).filter(models.Certificado.token == token_limpo).first()
+    
+    template = env.get_template("validacao.html")
+    
+    if certificado:
+        html_content = template.render(valido=True, certificado=certificado)
+    else:
+        html_content = template.render(valido=False)
+        
+    return HTMLResponse(content=html_content)
 
 
 @app.post("/gerar-certificado-teste")
@@ -70,7 +84,6 @@ def gerar_certificado_teste(dados: CertificadoRequest, db: Session = Depends(get
         db.rollback()
         return {"erro": str(e)}
 
-
 @app.post("/gerar-certificados-em-massa")
 def gerar_certificados_em_massa(
     arquivo_csv: UploadFile = File(...), 
@@ -79,14 +92,10 @@ def gerar_certificados_em_massa(
     db: Session = Depends(get_db)
 ):
     try:
-     
         df = pd.read_csv(arquivo_csv.file)
-        
-      
         zip_buffer = BytesIO()
         
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-            # 3. Itera sobre cada linha da planilha
             for index, row in df.iterrows():
                 nome = row['nome_participante']
                 email = row['email_participante']
@@ -106,7 +115,6 @@ def gerar_certificados_em_massa(
 
                 pdf_bytes = HTML(string=html_renderizado).write_pdf()
 
-               
                 novo_certificado = models.Certificado(
                     token=token,
                     nome_participante=nome,
@@ -116,11 +124,9 @@ def gerar_certificados_em_massa(
                 )
                 db.add(novo_certificado)
 
-           
                 nome_arquivo_zip = f"certificado_{nome.replace(' ', '_')}.pdf"
                 zip_file.writestr(nome_arquivo_zip, pdf_bytes)
             
-        
             db.commit()
 
         zip_buffer.seek(0)
@@ -134,3 +140,16 @@ def gerar_certificados_em_massa(
     except Exception as e:
         db.rollback()
         return {"erro": str(e)}
+
+@app.get("/validar/{token}", response_class=HTMLResponse)
+def validar_certificado(token: str, db: Session = Depends(get_db)):
+    certificado = db.query(models.Certificado).filter(models.Certificado.token == token).first()
+    
+    template = env.get_template("validacao.html")
+    
+    if certificado:
+        html_content = template.render(valido=True, certificado=certificado)
+    else:
+        html_content = template.render(valido=False)
+        
+    return HTMLResponse(content=html_content)
