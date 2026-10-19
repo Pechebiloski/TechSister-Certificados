@@ -141,11 +141,11 @@ uvicorn app.main:app --reload
 
 ### 🌷 "07" · Roadmap
 
-- [ ] Estrutura inicial e modelagem do banco.
-- [ ] Geração de PDF individual e em massa (ZIP).
-- [ ] Integração com WeasyPrint (Template HTML/CSS).
-- [ ] Página de validação pública via QR Code.
-- [ ] Disparo de e-mail com anexo (testado via Mailtrap).
+- [🗸] Estrutura inicial e modelagem do banco.
+- [🗸] Geração de PDF individual e em massa (ZIP).
+- [🗸] Integração com WeasyPrint (Template HTML/CSS).
+- [🗸] Página de validação pública via QR Code.
+- [🗸] Disparo de e-mail com anexo (testado via Mailtrap).
 - [ ] Criação de interface web (`/admin`) para facilitar o uso da equipe.
 - [ ] Deploy em nuvem (Render/Railway).
 - [ ] Integração direta com API do Google Sheets.
