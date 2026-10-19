@@ -3,16 +3,24 @@ import os
 import qrcode
 from io import BytesIO
 import base64
-from datetime import datetime
+import secrets
+import smtplib
+from email.message import EmailMessage
 from dotenv import load_dotenv
 
 load_dotenv()
 
-def gerar_token_seguro(evento: str, email: str) -> str:
-    """Gera um hash SHA-256 único usando dados do aluno e um 'salt' secreto."""
-    salt = os.getenv("SECRET_SALT", "salt_padrao")
-    raw_data = f"{salt}-{evento}-{email}-{datetime.now().isoformat()}"
-    return hashlib.sha256(raw_data.encode('utf-8')).hexdigest()
+def gerar_token_seguro(evento: str, email: str):
+    """
+    Gera um token aleatório de 256 bits e retorna (token_bruto, hash_do_token).
+    O token_bruto vai para o QR Code. O hash vai para o banco de dados.
+    """
+    # Gera 256 bits de aleatoriedade criptográfica (impossível de adivinhar)
+    token_bruto = secrets.token_urlsafe(32)
+    # O banco de dados só guarda o hash, nunca o token original
+    token_hash = hashlib.sha256(token_bruto.encode()).hexdigest()
+    
+    return token_bruto, token_hash
 
 def gerar_qr_code_base64(texto_url: str) -> str:
     qr = qrcode.QRCode(version=1, box_size=10, border=2)
@@ -24,11 +32,6 @@ def gerar_qr_code_base64(texto_url: str) -> str:
     buffered = BytesIO()
     img.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode()
-
-
-import smtplib
-from email.message import EmailMessage
-
 
 def enviar_email_certificado(destinatario: str, nome: str, evento: str, pdf_bytes: bytes):
     """Envia o certificado em anexo por e-mail."""
@@ -51,8 +54,9 @@ Equipe Tech Sisters 💖
     msg.add_attachment(pdf_bytes, maintype='application', subtype='pdf', filename=nome_arquivo)
     
     try:
-        with smtplib.SMTP(os.getenv('SMTP_SERVER'), int(os.getenv('SMTP_PORT'))) as server:
-            server.starttls() # Criptografia
+        # Adicionado timeout=10 para não travar o servidor se o e-mail falhar
+        with smtplib.SMTP(os.getenv('SMTP_SERVER'), int(os.getenv('SMTP_PORT')), timeout=10) as server:
+            server.starttls() 
             server.login(os.getenv('SMTP_USER'), os.getenv('SMTP_PASSWORD'))
             server.send_message(msg)
             print(f"✅ E-mail enviado com sucesso para {destinatario}")

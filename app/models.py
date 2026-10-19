@@ -12,3 +12,4 @@ class Certificado(Base):
     evento = Column(String, nullable=False)
     carga_horaria = Column(Integer, nullable=False)
     data_emissao = Column(DateTime, default=datetime.utcnow)
+    status = Column(String, default="ativo", nullable=False) # NOVA COLUNA

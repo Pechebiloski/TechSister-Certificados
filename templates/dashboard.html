@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Tech Sisters</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #fdf2f8; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 20px; border-radius: 10px; border-left: 8px solid #d81b60; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1 { color: #d81b60; margin: 0; }
+        .btn { background: #d81b60; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .btn:hover { background: #ad1457; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #ffb6c1; color: #333; }
+        .status-ativo { color: #2e7d32; font-weight: bold; }
+        .status-revogado { color: #c62828; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Painel de Certificados</h1>
+        <a href="/admin" class="btn">+ Novo Evento</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Participante</th>
+                <th>Evento</th>
+                <th>Data</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cert in certificados %}
+            <tr>
+                <td>#{{ cert.id }}</td>
+                <td>{{ cert.nome_participante }}</td>
+                <td>{{ cert.evento }}</td>
+                <td>{{ cert.data_emissao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>
+                    {% if cert.status == 'ativo' %}
+                        <span class="status-ativo">Ativo</span>
+                    {% else %}
+                        <span class="status-revogado">Revogado</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center;">Nenhum certificado gerado ainda.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
