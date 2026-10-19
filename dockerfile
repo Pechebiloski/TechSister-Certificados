@@ -2,6 +2,7 @@ FROM python:3.11-slim-bookworm
 
 WORKDIR /app
 
+# Instala as dependências do Linux necessárias para o WeasyPrint e Pandas
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
@@ -9,12 +10,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcairo2 \
     libharfbuzz0b \
     libgdk-pixbuf-2.0-0 \
+    gcc \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
-
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
 
 COPY . .
 
