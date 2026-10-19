@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        /* Força o tamanho A4 deitado e remove margens da impressão */
+        
         @page { 
             size: A4 landscape; 
             margin: 0; 
@@ -13,15 +13,15 @@
             font-family: 'Arial', sans-serif; 
             margin: 0; 
             padding: 0; 
-            background-color: #fdf2f8; /* Fundo rosinha claro */
+            background-color: #fdf2f8; 
         }
         
-        /* Container exato do tamanho da folha A4 deitada */
+        
         .container {
             width: 297mm; 
             height: 210mm; 
-            box-sizing: border-box; /* Garante que a borda não aumente o tamanho */
-            border: 15px solid #d81b60; /* Borda rosa escuro */
+            box-sizing: border-box; 
+            border: 15px solid #d81b60; 
             padding: 20px;
             display: flex; 
             flex-direction: column; 
@@ -29,7 +29,7 @@
             justify-content: center;
             text-align: center;
             position: relative;
-            page-break-after: avoid; /* Impede quebra de página */
+            page-break-after: avoid; 
         }
         
         h1 { color: #d81b60; font-size: 32px; margin: 0 0 10px 0; letter-spacing: 2px; }
@@ -39,7 +39,7 @@
         
         .qr-container img { width: 100px; height: 100px; margin-top: 10px; }
         
-        /* Fixa o rodapé lá embaixo para não empurrar o conteúdo */
+        
         .rodape { 
             font-size: 10px; 
             color: #777; 

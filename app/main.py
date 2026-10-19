@@ -22,15 +22,25 @@ env = Environment(loader=FileSystemLoader("templates"))
 
 BASE_URL_VALIDACAO = os.getenv("BASE_URL_VALIDACAO", "https://techsisters.com.br")
 
+from pydantic import BaseModel, Field
 class CertificadoRequest(BaseModel):
     nome_participante: str
     email_participante: str
     evento: str
-    carga_horaria: int
+    carga_horaria: int = Field(gt=0, description="A carga horária deve ser maior que zero")
+
 
 @app.get("/")
 def read_root():
     return {"status": "Online", "message": "API de Certificados Tech Sisters rodando!"}
+
+
+@app.get("/admin", response_class=HTMLResponse)
+def pagina_admin():
+
+    with open("templates/admin.html", "r", encoding="utf-8") as file:
+        return HTMLResponse(content=file.read())
+
 
 @app.post("/gerar-certificado-teste")
 def gerar_certificado_teste(dados: CertificadoRequest, db: Session = Depends(get_db)):
@@ -70,12 +80,13 @@ def gerar_certificado_teste(dados: CertificadoRequest, db: Session = Depends(get
     except Exception as e:
         db.rollback()
         return {"erro": str(e)}
-    
+
+
 @app.post("/gerar-certificados-em-massa")
 def gerar_certificados_em_massa(
     arquivo_csv: UploadFile = File(...), 
     evento: str = Form(...),
-    carga_horaria: int = Form(...),
+    carga_horaria: int = Form(..., gt=0),
     db: Session = Depends(get_db)
 ):
     try:
@@ -138,10 +149,8 @@ def gerar_certificados_em_massa(
         db.rollback()
         return {"erro": str(e)}
 
-
 @app.get("/validar/{token}", response_class=HTMLResponse)
 def validar_certificado(token: str, db: Session = Depends(get_db)):
-
     token_limpo = token.strip() 
     
     certificado = db.query(models.Certificado).filter(models.Certificado.token == token_limpo).first()

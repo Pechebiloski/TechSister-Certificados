@@ -26,11 +26,9 @@ def gerar_qr_code_base64(texto_url: str) -> str:
     return base64.b64encode(buffered.getvalue()).decode()
 
 
-    # ... (mantenha os imports que já estão no topo do arquivo) ...
 import smtplib
 from email.message import EmailMessage
 
-# ... (mantenha as funções gerar_token_seguro e gerar_qr_code_base64) ...
 
 def enviar_email_certificado(destinatario: str, nome: str, evento: str, pdf_bytes: bytes):
     """Envia o certificado em anexo por e-mail."""
@@ -49,12 +47,9 @@ Com carinho,
 Equipe Tech Sisters 💖
 """
     msg.set_content(corpo)
-    
-    # Anexa o PDF
     nome_arquivo = f"certificado_{nome.replace(' ', '_')}.pdf"
     msg.add_attachment(pdf_bytes, maintype='application', subtype='pdf', filename=nome_arquivo)
     
-    # Conecta ao servidor e envia
     try:
         with smtplib.SMTP(os.getenv('SMTP_SERVER'), int(os.getenv('SMTP_PORT'))) as server:
             server.starttls() # Criptografia
