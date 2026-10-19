@@ -12,9 +12,10 @@ import zipfile
 import os
 import secrets
 import logging
-import hashlib 
+import hashlib
 from dotenv import load_dotenv
 
+# Carrega o .env
 load_dotenv()
 
 from app.database import engine, get_db
@@ -37,6 +38,7 @@ class CertificadoRequest(BaseModel):
     evento: str
     carga_horaria: int = Field(gt=0, description="A carga horária deve ser maior que zero")
 
+# --- SEGURANÇA ---
 security = HTTPBasic()
 
 def verificar_credenciais(credentials: HTTPBasicCredentials = Depends(security)):
@@ -50,6 +52,7 @@ def verificar_credenciais(credentials: HTTPBasicCredentials = Depends(security))
         )
     return credentials.username
 
+# --- ROTAS ---
 @app.get("/")
 def read_root():
     return {"status": "Online", "message": "API de Certificados Tech Sisters rodando!"}
@@ -58,6 +61,13 @@ def read_root():
 def pagina_admin():
     with open("templates/admin.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read())
+
+@app.get("/dashboard", response_class=HTMLResponse, dependencies=[Depends(verificar_credenciais)])
+def pagina_dashboard(db: Session = Depends(get_db)):
+    certificados = db.query(models.Certificado).order_by(models.Certificado.id.desc()).all()
+    template = env.get_template("dashboard.html")
+    html_content = template.render(certificados=certificados)
+    return HTMLResponse(content=html_content)
 
 @app.post("/gerar-certificado-teste", dependencies=[Depends(verificar_credenciais)])
 def gerar_certificado_teste(dados: CertificadoRequest, db: Session = Depends(get_db)):
@@ -178,20 +188,9 @@ def validar_certificado(token_bruto: str, db: Session = Depends(get_db)):
     certificado = db.query(models.Certificado).filter(models.Certificado.token == token_hash).first()
     template = env.get_template("validacao.html")
     
-    # Verifica se existe E se está ativo
     if certificado and certificado.status == "ativo":
         html_content = template.render(valido=True, certificado=certificado)
     else:
         html_content = template.render(valido=False)
         
-    return HTMLResponse(content=html_content)
-
-@app.get("/dashboard", response_class=HTMLResponse, dependencies=[Depends(verificar_credenciais)])
-def pagina_dashboard(db: Session = Depends(get_db)):
-    # Busca todos os certificados no banco, ordenando pelos mais recentes
-    certificados = db.query(models.Certificado).order_by(models.Certificado.id.desc()).all()
-    
-    template = env.get_template("dashboard.html")
-    html_content = template.render(certificados=certificados)
-    
     return HTMLResponse(content=html_content)
