@@ -20,11 +20,18 @@
             <div class="valido">✅ Certificado Válido</div>
             <p>Este certificado é autêntico e foi emitido pela comunidade Tech Sisters.</p>
             <div class="info">
-                <p><strong>Participante:</strong> {{ certificado.nome_participante }}</p>
-                <p><strong>Evento:</strong> {{ certificado.evento }}</p>
-                <p><strong>Carga Horária:</strong> {{ certificado.carga_horaria }} horas</p>
-                <p><strong>Data de Emissão:</strong> {{ certificado.data_emissao.strftime('%d/%m/%Y') }}</p>
-            </div>
+    {% set partes_nome = certificado.nome_participante.split() %}
+    <p><strong>Participante:</strong> 
+        {% if partes_nome|length > 1 %}
+            {{ partes_nome[0] }} {{ partes_nome[-1][0] }}.
+        {% else %}
+            {{ partes_nome[0] }}
+        {% endif %}
+    </p>
+    <p><strong>Evento:</strong> {{ certificado.evento }}</p>
+    <p><strong>Carga Horária:</strong> {{ certificado.carga_horaria }} horas</p>
+    <p><strong>Data de Emissão:</strong> {{ certificado.data_emissao.strftime('%d/%m/%Y') }}</p>
+</div>
         {% else %}
             <h1>Tech Sisters</h1>
             <div class="invalido">❌ Certificado Inválido</div>
