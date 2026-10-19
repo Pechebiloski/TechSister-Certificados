@@ -37,6 +37,8 @@ class CertificadoRequest(BaseModel):
     email_participante: str
     evento: str
     carga_horaria: int = Field(gt=0, description="A carga horária deve ser maior que zero")
+    # NOVO CAMPO AQUI
+    organizadores: str = "Tech Sisters" 
 
 # --- SEGURANÇA ---
 security = HTTPBasic()
@@ -100,11 +102,14 @@ def gerar_certificado_teste(dados: CertificadoRequest, db: Session = Depends(get
         url_validacao = f"{BASE_URL_VALIDACAO}/validar/{token_bruto}"
         qr_base64 = gerar_qr_code_base64(url_validacao)
 
+        carga_texto = f"{dados.carga_horaria} hora" if dados.carga_horaria == 1 else f"{dados.carga_horaria} horas"
+
         template = env.get_template("certificado.html")
         html_renderizado = template.render(
             nome_participante=dados.nome_participante,
             evento=dados.evento,
-            carga_horaria=dados.carga_horaria,
+            carga_horaria=carga_texto,
+            organizadores=dados.organizadores, # <--- ADICIONADO AQUI
             token=token_bruto,
             qr_code_base64=qr_base64,
             url_validacao=url_validacao
@@ -139,6 +144,7 @@ def gerar_certificados_em_massa(
     arquivo_csv: UploadFile = File(...), 
     evento: str = Form(...),
     carga_horaria: int = Form(..., gt=0),
+    organizadores: str = Form("Tech Sisters"), # <--- ADICIONADO AQUI
     db: Session = Depends(get_db)
 ):
     try:
@@ -161,11 +167,14 @@ def gerar_certificados_em_massa(
                 url_validacao = f"{BASE_URL_VALIDACAO}/validar/{token_bruto}"
                 qr_base64 = gerar_qr_code_base64(url_validacao)
 
+                carga_texto = f"{carga_horaria} hora" if carga_horaria == 1 else f"{carga_horaria} horas"
+
                 template = env.get_template("certificado.html")
                 html_renderizado = template.render(
                     nome_participante=nome,
                     evento=evento,
-                    carga_horaria=carga_horaria,
+                    carga_horaria=carga_texto,
+                    organizadores=organizadores, # <--- ADICIONADO AQUI
                     token=token_bruto,
                     qr_code_base64=qr_base64,
                     url_validacao=url_validacao

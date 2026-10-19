@@ -18,6 +18,11 @@
 </head>
 
 <body>
+        <!-- BOTÃO DE NAVEGAÇÃO -->
+    <div style="position: absolute; top: 20px; right: 20px;">
+        <a href="/dashboard" style="background: #d81b60; color: white; padding: 12px 24px; text-decoration: none; border-radius: 10px; font-weight: bold; box-shadow: 3px 3px 0 #8e0e3f; border: none; font-family: Arial;">📊 Ver Dashboard</a>
+    </div>
+
        <!-- BARRA DE NAVEGAÇÃO -->
     <div style="position: absolute; top: 20px; right: 20px; display: flex; gap: 10px;">
         <a href="/dashboard" style="background: #d81b60; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; border: 2px solid #fff; box-shadow: 2px 2px 0 #ad1457;">📊 Ver Dashboard</a>
@@ -36,6 +41,13 @@
             
             <label for="carga_horaria">Carga Horária (horas)</label>
             <input type="number" name="carga_horaria" id="carga_horaria" min="1" placeholder="Ex: 3" required>
+
+                        <label for="carga_horaria">Carga Horária (horas)</label>
+            <input type="number" name="carga_horaria" id="carga_horaria" min="1" placeholder="Ex: 3" required>
+            
+            <!-- NOVO CAMPO AQUI -->
+            <label for="organizadores">Realização / Parceria</label>
+            <input type="text" name="organizadores" id="organizadores" value="Tech Sisters" required>
             
             <button type="submit">Gerar e Enviar Certificados</button>
         </form>

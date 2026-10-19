@@ -4,38 +4,69 @@
     <meta charset="UTF-8">
     <title>Dashboard - Tech Sisters</title>
     <style>
-        body { font-family: 'Arial', sans-serif; background-color: #fdf2f8; margin: 0; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 20px; border-radius: 10px; border-left: 8px solid #d81b60; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h1 { color: #d81b60; margin: 0; }
-        .btn { background: #d81b60; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; border: none; cursor: pointer; font-size: 14px;}
-        .btn:hover { background: #ad1457; }
-        .busca-container { margin-bottom: 20px; display: flex; gap: 10px; }
-        .busca-container input { flex: 1; padding: 12px; border: 2px solid #ffb6c1; border-radius: 5px; font-size: 16px; outline: none; }
+        /* Importa uma fonte mais moderna do Google */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #fdf2f8; /* Fundo rosinha */
+            background-image: radial-gradient(#ffb6c1 1px, transparent 1px); /* Bolinhas */
+            background-size: 20px 20px;
+            margin: 0; padding: 30px; 
+        }
+        .header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: white; padding: 20px 30px; border-radius: 15px; 
+            border: 3px solid #d81b60; box-shadow: 6px 6px 0 #ffb6c1; 
+            margin-bottom: 30px; 
+        }
+        h1 { color: #d81b60; margin: 0; font-size: 28px; }
+        
+        .btn { 
+            background: #d81b60; color: white; padding: 12px 24px; 
+            text-decoration: none; border-radius: 10px; font-weight: bold; 
+            border: none; cursor: pointer; font-size: 15px; 
+            box-shadow: 3px 3px 0 #8e0e3f; transition: all 0.2s;
+        }
+        .btn:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #8e0e3f; }
+        
+        .busca-container { margin-bottom: 30px; display: flex; gap: 15px; }
+        .busca-container input { 
+            flex: 1; padding: 15px; border: 3px solid #ffb6c1; border-radius: 10px; 
+            font-size: 16px; outline: none; font-family: 'Inter', sans-serif;
+        }
         .busca-container input:focus { border-color: #d81b60; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #ffb6c1; color: #333; }
-        .status-ativo { color: #2e7d32; font-weight: bold; }
-        .status-revogado { color: #c62828; font-weight: bold; text-decoration: line-through; }
-        .acoes { display: flex; gap: 5px; }
-        .btn-acao { padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 12px; text-decoration: none; color: white;}
+        
+        table { 
+            width: 100%; border-collapse: collapse; background: white; 
+            border-radius: 15px; overflow: hidden; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); border: 2px solid #ffb6c1;
+        }
+        th, td { padding: 18px 20px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #d81b60; color: white; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .status-ativo { color: #2e7d32; font-weight: bold; background: #e8f5e9; padding: 5px 10px; border-radius: 20px; font-size: 13px;}
+        .status-revogado { color: #c62828; font-weight: bold; text-decoration: line-through; background: #ffebee; padding: 5px 10px; border-radius: 20px; font-size: 13px;}
+        
+        .btn-acao { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; color: white; transition: 0.2s;}
         .btn-editar { background-color: #1e88e5; }
         .btn-revogar { background-color: #c62828; }
-        .input-edicao { padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 120px; }
+        .btn-acao:hover { opacity: 0.8; }
+        
+        .input-edicao { padding: 8px; border: 1px solid #ccc; border-radius: 5px; width: 140px; font-family: 'Inter', sans-serif;}
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Painel de Certificados</h1>
+        <h1>✦ Painel de Certificados</h1>
         <a href="/admin" class="btn">+ Novo Evento</a>
     </div>
 
-    <!-- FORMULÁRIO DE BUSCA -->
     <form method="get" action="/dashboard" class="busca-container">
         <input type="text" name="q" placeholder="Buscar por nome da participante ou evento..." value="{{ busca or '' }}">
-        <button type="submit" class="btn">Buscar</button>
+        <button type="submit" class="btn" style="background: #333; box-shadow: 3px 3px 0 #111;">Buscar</button>
         {% if busca %}
-            <a href="/dashboard" class="btn" style="background: #666;">Limpar</a>
+            <a href="/dashboard" class="btn" style="background: #666; box-shadow: 3px 3px 0 #333;">Limpar</a>
         {% endif %}
     </form>
 
@@ -53,10 +84,9 @@
         <tbody>
             {% for cert in certificados %}
             <tr>
-                <td>#{{ cert.id }}</td>
+                <td><strong>#{{ cert.id }}</strong></td>
                 <td>
-                    <!-- Formulário de Edição Inline Rápida -->
-                    <form method="post" action="/admin/editar/{{ cert.id }}" style="display: flex; gap: 5px;">
+                    <form method="post" action="/admin/editar/{{ cert.id }}" style="display: flex; gap: 8px; align-items: center;">
                         <input type="text" name="novo_nome" value="{{ cert.nome_participante }}" class="input-edicao">
                         <button type="submit" class="btn-acao btn-editar">Salvar</button>
                     </form>
@@ -65,15 +95,14 @@
                 <td>{{ cert.data_emissao.strftime('%d/%m/%Y %H:%M') }}</td>
                 <td>
                     {% if cert.status == 'ativo' %}
-                        <span class="status-ativo">Ativo</span>
+                        <span class="status-ativo">🟢 Ativo</span>
                     {% else %}
-                        <span class="status-revogado">Revogado</span>
+                        <span class="status-revogado">🔴 Revogado</span>
                     {% endif %}
                 </td>
                 <td>
-                    <!-- Formulário de Revogação -->
                     <form method="post" action="/admin/revogar/{{ cert.id }}" style="margin: 0;">
-                        <button type="submit" class="btn-acao btn-revogar" {% if cert.status == 'revogado' %}disabled style="opacity: 0.5;"{% endif %}>
+                        <button type="submit" class="btn-acao btn-revogar" {% if cert.status == 'revogado' %}disabled style="opacity: 0.3; cursor: not-allowed;"{% endif %}>
                             Revogar
                         </button>
                     </form>
@@ -81,7 +110,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="6" style="text-align: center;">Nenhum certificado encontrado.</td>
+                <td colspan="6" style="text-align: center; padding: 40px; color: #666;">Nenhum certificado encontrado.</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -2,7 +2,6 @@ FROM python:3.11-slim-bookworm
 
 WORKDIR /app
 
-# Instala as dependências do Linux necessárias para o WeasyPrint e Pandas
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
