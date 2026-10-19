@@ -29,8 +29,8 @@ app = FastAPI(title="Tech Sisters Certificados API")
 env = Environment(loader=FileSystemLoader("templates"))
 
 BASE_URL_VALIDACAO = os.getenv("BASE_URL_VALIDACAO", "http://localhost:8000")
-ADMIN_USER = os.getenv("ADMIN_USER", "admin")
-ADMIN_PASS = os.getenv("ADMIN_PASS", "techsisters2026")
+ADMIN_USER = os.getenv("ADMIN_USER")
+ADMIN_PASS = os.getenv("ADMIN_PASS")
 
 class CertificadoRequest(BaseModel):
     nome_participante: str
@@ -157,11 +157,11 @@ def gerar_certificados_em_massa(
         
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
             for index, row in df.iterrows():
+                if pd.isna(row['nome_participante']) or pd.isna(row['email_participante']):
+                   continue # Pula linhas vazias de verdade
+
                 nome = str(row['nome_participante'])
                 email = str(row['email_participante'])
-                
-                if pd.isna(nome) or pd.isna(email):
-                    continue
 
                 token_bruto, token_hash = gerar_token_seguro(evento, email)
                 url_validacao = f"{BASE_URL_VALIDACAO}/validar/{token_bruto}"
@@ -182,11 +182,7 @@ def gerar_certificados_em_massa(
 
                 pdf_bytes = HTML(string=html_renderizado).write_pdf()
 
-                try:
-                    enviar_email_certificado(destinatario=email, nome=nome, evento=evento, pdf_bytes=pdf_bytes)
-                except Exception as email_error:
-                    logging.error(f"Erro email {email}: {email_error}")
-
+                
                 novo_certificado = models.Certificado(
                     token=token_hash,
                     nome_participante=nome,
@@ -195,11 +191,17 @@ def gerar_certificados_em_massa(
                     carga_horaria=carga_horaria
                 )
                 db.add(novo_certificado)
+                db.commit() 
 
+               
+                try:
+                    enviar_email_certificado(destinatario=email, nome=nome, evento=evento, pdf_bytes=pdf_bytes)
+                except Exception as email_error:
+                    logging.error(f"Erro email {email}: {email_error}")
+
+                # 3. Escreve no ZIP
                 nome_limpo = "".join(c for c in nome if c.isalnum() or c in (' ', '_')).rstrip()
                 zip_file.writestr(f"certificado_{nome_limpo.replace(' ', '_')}.pdf", pdf_bytes)
-            
-            db.commit()
 
         zip_buffer.seek(0)
         return StreamingResponse(
