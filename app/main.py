@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Depends, UploadFile, File, Form, HTTPException, status
-from fastapi.responses import StreamingResponse, HTMLResponse
+from fastapi import FastAPI, Depends, UploadFile, File, Form, HTTPException, status, Query
+from fastapi.responses import StreamingResponse, HTMLResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session
 from weasyprint import HTML
@@ -63,11 +63,35 @@ def pagina_admin():
         return HTMLResponse(content=file.read())
 
 @app.get("/dashboard", response_class=HTMLResponse, dependencies=[Depends(verificar_credenciais)])
-def pagina_dashboard(db: Session = Depends(get_db)):
-    certificados = db.query(models.Certificado).order_by(models.Certificado.id.desc()).all()
+def pagina_dashboard(q: str = Query(None), db: Session = Depends(get_db)):
+    query = db.query(models.Certificado)
+    
+    if q:
+        query = query.filter(
+            (models.Certificado.nome_participante.ilike(f"%{q}%")) | 
+            (models.Certificado.evento.ilike(f"%{q}%"))
+        )
+        
+    certificados = query.order_by(models.Certificado.id.desc()).all()
     template = env.get_template("dashboard.html")
-    html_content = template.render(certificados=certificados)
+    html_content = template.render(certificados=certificados, busca=q)
     return HTMLResponse(content=html_content)
+
+@app.post("/admin/revogar/{id}", dependencies=[Depends(verificar_credenciais)])
+def revogar_certificado(id: int, db: Session = Depends(get_db)):
+    cert = db.query(models.Certificado).filter(models.Certificado.id == id).first()
+    if cert:
+        cert.status = "revogado"
+        db.commit()
+    return RedirectResponse(url="/dashboard", status_code=303)
+
+@app.post("/admin/editar/{id}", dependencies=[Depends(verificar_credenciais)])
+def editar_certificado(id: int, novo_nome: str = Form(...), db: Session = Depends(get_db)):
+    cert = db.query(models.Certificado).filter(models.Certificado.id == id).first()
+    if cert:
+        cert.nome_participante = novo_nome
+        db.commit()
+    return RedirectResponse(url="/dashboard", status_code=303)
 
 @app.post("/gerar-certificado-teste", dependencies=[Depends(verificar_credenciais)])
 def gerar_certificado_teste(dados: CertificadoRequest, db: Session = Depends(get_db)):
