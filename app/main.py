@@ -14,7 +14,7 @@ import secrets
 import logging
 from dotenv import load_dotenv
 
-# Carrega o .env ANTES de qualquer coisa
+
 load_dotenv()
 
 from app.database import engine, get_db
@@ -27,10 +27,10 @@ app = FastAPI(title="Tech Sisters Certificados API")
 
 env = Environment(loader=FileSystemLoader("templates"))
 
-# Pega as variáveis do .env com fallback seguro
+
 BASE_URL_VALIDACAO = os.getenv("BASE_URL_VALIDACAO", "http://localhost:8000")
-ADMIN_USER = os.getenv("ADMIN_USER", "admin")
-ADMIN_PASS = os.getenv("ADMIN_PASS", "techsisters2026")
+ADMIN_USER = os.getenv("ADMIN_USER", "")
+ADMIN_PASS = os.getenv("ADMIN_PASS", "")
 
 class CertificadoRequest(BaseModel):
     nome_participante: str
@@ -38,7 +38,7 @@ class CertificadoRequest(BaseModel):
     evento: str
     carga_horaria: int = Field(gt=0, description="A carga horária deve ser maior que zero")
 
-# --- SEGURANÇA ---
+
 security = HTTPBasic()
 
 def verificar_credenciais(credentials: HTTPBasicCredentials = Depends(security)):
@@ -52,7 +52,6 @@ def verificar_credenciais(credentials: HTTPBasicCredentials = Depends(security))
         )
     return credentials.username
 
-# --- ROTAS ---
 @app.get("/")
 def read_root():
     return {"status": "Online", "message": "API de Certificados Tech Sisters rodando!"}
