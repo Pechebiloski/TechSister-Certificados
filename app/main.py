@@ -1,14 +1,16 @@
-from fastapi import FastAPI, Depends, UploadFile, File, Form
+from fastapi import FastAPI, Depends, UploadFile, File, Form, HTTPException, status
 from fastapi.responses import StreamingResponse, HTMLResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session
 from weasyprint import HTML
 from jinja2 import Environment, FileSystemLoader
 from io import BytesIO
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import urllib.parse
 import pandas as pd
 import zipfile
 import os
+import secrets
 
 from app.database import engine, get_db
 from app import models
@@ -22,7 +24,6 @@ env = Environment(loader=FileSystemLoader("templates"))
 
 BASE_URL_VALIDACAO = os.getenv("BASE_URL_VALIDACAO", "https://techsisters.com.br")
 
-from pydantic import BaseModel, Field
 class CertificadoRequest(BaseModel):
     nome_participante: str
     email_participante: str
@@ -30,17 +31,29 @@ class CertificadoRequest(BaseModel):
     carga_horaria: int = Field(gt=0, description="A carga horária deve ser maior que zero")
 
 
+security = HTTPBasic()
+
+def verificar_credenciais(credentials: HTTPBasicCredentials = Depends(security)):
+    is_correct_username = secrets.compare_digest(credentials.username, "admin")
+    is_correct_password = secrets.compare_digest(credentials.password, "techsisters2026")
+    if not (is_correct_username and is_correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Acesso negado",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
+
+
 @app.get("/")
 def read_root():
     return {"status": "Online", "message": "API de Certificados Tech Sisters rodando!"}
 
-
-@app.get("/admin", response_class=HTMLResponse)
+# ROTA ADMIN PROTEGIDA (Note o 'dependencies' aqui!)
+@app.get("/admin", response_class=HTMLResponse, dependencies=[Depends(verificar_credenciais)])
 def pagina_admin():
-
     with open("templates/admin.html", "r", encoding="utf-8") as file:
         return HTMLResponse(content=file.read())
-
 
 @app.post("/gerar-certificado-teste")
 def gerar_certificado_teste(dados: CertificadoRequest, db: Session = Depends(get_db)):
@@ -80,7 +93,6 @@ def gerar_certificado_teste(dados: CertificadoRequest, db: Session = Depends(get
     except Exception as e:
         db.rollback()
         return {"erro": str(e)}
-
 
 @app.post("/gerar-certificados-em-massa")
 def gerar_certificados_em_massa(
