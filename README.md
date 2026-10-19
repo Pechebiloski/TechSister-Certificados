@@ -11,19 +11,15 @@ Uma solução completa em Python para automatizar a emissão, o envio, a valida�
 
 ## Demonstração do Sistema
 
-Aqui estão algumas capturas de tela do sistema em funcionamento:
-
 | Painel Administrativo | Dashboard de Gerenciamento |
 | :---: | :---: |
-| <img src="assets/admin.png" width="400" alt="Tela de Admin"> | <img src="assets/dashboard.png" width="400" alt="Dashboard"> |
+| <img src="./assets/interface_teste.PNG" width="400" alt="Tela de Admin"> | <img src="./assets/dashboard_edicao.PNG" width="400" alt="Dashboard"> |
 | *Interface amigável para upload de CSV e configuração do evento.* | *Painel com busca, edição rápida e revogação de certificados.* |
 
 | Certificado Gerado (PDF) | Página Pública de Validação |
 | :---: | :---: |
-| <img src="assets/certificado.png" width="400" alt="Certificado PDF"> | <img src="assets/validacao.png" width="400" alt="Tela de Validação"> |
-| *Certificado gerado dinamicamente com QR Code de autenticidade.* | *Validação pública com mascaramento de dados (LGPD).* |
-
-*(Nota: substitua os caminhos `assets/imagem.png` se você colocar as imagens em outra pasta).*
+| <img src="./assets/teste_certificado.PNG" width="400" alt="Certificado PDF"> | <img src="./assets/resultado_teste.PNG" width="400" alt="Tela de Validação"> |
+| *Certificado gerado dinamicamente com QR Code e campo de parceria.* | *Validação pública com mascaramento de dados (LGPD).* |
 
 ---
 
@@ -40,7 +36,7 @@ O sistema resolve gargalos operacionais, como a emissão em lote, a padronizaç�
 - **Envio Automatizado:** Disparo de e-mails personalizados com o certificado em anexo.
 - **QR Code de Validação:** Cada certificado possui um código único criptográfico.
 - **Painel Administrativo (`/admin`):** Interface protegida por senha para emissão em massa.
-- **Dashboard (`/dashboard`):** Visualização de todos os certificados, com busca por nome/evento, edição em linha (correção de nomes) e revogação de certificados.
+- **Dashboard (`/dashboard`):** Visualização de todos os certificados, com busca por nome/evento, edição em linha e revogação.
 - **Validação Pública:** Página de verificação acessível via QR Code.
 
 ## "03" - Segurança e LGPD
@@ -48,29 +44,29 @@ O sistema resolve gargalos operacionais, como a emissão em lote, a padronizaç�
 A arquitetura foi pensada para proteger os dados das participantes:
 
 - **Tokens Criptográficos:** O sistema gera um token aleatório de 256 bits (via `secrets`). O banco de dados armazena apenas o hash SHA-256 desse token, nunca o valor real.
-- **Privacidade (LGPD):** A página pública de validação exibe apenas o primeiro nome e a inicial do sobrenome da participante (ex: "Maria S."), além de omitir dados sensíveis.
-- **Proteção de Rotas:** As rotas de administração e geração utilizam HTTP Basic Auth (usuário e senha configurados via variáveis de ambiente).
-- **Revogação:** Certificados podem ser revogados no dashboard. Se o QR Code for escaneado, a página indicará que o documento é inválido.
+- **Privacidade (LGPD):** A página pública de validação exibe apenas o primeiro nome e a inicial do sobrenome da participante (ex: "Maria S.").
+- **Proteção de Rotas:** As rotas de administração utilizam HTTP Basic Auth (usuário e senha no `.env`).
+- **Revogação:** Certificados podem ser revogados. Se o QR Code for escaneado, a página indicará que o documento é inválido.
 
 ## "04" - Tecnologias Utilizadas
 
 | Tecnologia | Aplicação |
 | :--- | :--- |
 | **Python** | Linguagem principal do backend. |
-| **FastAPI** | Framework web para construção da API e rotas. |
+| **FastAPI** | Framework web para construção da API. |
 | **Jinja2** | Renderização dos templates HTML. |
 | **WeasyPrint** | Conversão de HTML/CSS em PDFs de alta qualidade. |
-| **SQLAlchemy + SQLite** | ORM e banco de dados (pronto para migrar para PostgreSQL em produção). |
-| **qrcode + Pillow** | Geração e processamento dos QR Codes. |
-| **Pandas** | Leitura e tratamento das planilhas CSV. |
-| **smtplib** | Envio de e-mails (com testes realizados via Mailtrap). |
+| **SQLAlchemy + SQLite** | ORM e banco de dados (pronto para PostgreSQL). |
+| **qrcode + Pillow** | Geração de QR Codes. |
+| **Pandas** | Leitura de planilhas CSV. |
+| **smtplib** | Envio de e-mails. |
 
 ## "05" - Como executar o projeto localmente
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/tech-sisters-certificados.git
-cd tech-sisters-certificados
+git clone https://github.com/Pechebiloski/TechSister-Certificados.git
+cd TechSister-Certificados
 Crie e ative um ambiente virtual:
 
 bash
@@ -81,7 +77,7 @@ Instale as dependências:
 
 bash
 pip install -r requirements.txt
-Instale as dependências do sistema (necessárias para o WeasyPrint no Linux/Codespaces):
+Instale as dependências do sistema (necessárias para o WeasyPrint):
 
 bash
 sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0 libgdk-pixbuf2.0-0
@@ -89,8 +85,6 @@ Configure o .env (use o .env.example como base):
 
 bash
 cp .env.example .env
-(Preencha as credenciais de SMTP e defina as senhas de administrador).
-
 Inicie o servidor:
 
 bash
@@ -104,7 +98,6 @@ Acesse http://127.0.0.1:8000/admin para a interface de emissão.
 ☑ Página de validação pública via QR Code (com LGPD).
 ☑ Disparo de e-mail com anexo.
 ☑ Implementação de segurança (Hash SHA-256, Basic Auth).
-☑ Dashboard de gerenciamento com busca, edição e revogação.
-□ Deploy em nuvem (Render/Railway) com PostgreSQL.
-□ Integração direta com a API do Google Sheets.
-Desenvolvido com dedicação para a comunidade Tech Sisters.
+☑ Dashboard com busca, edição e revogação.
+□ Deploy em nuvem (Render/Railway).
+□ Integração direta com API do Google Sheets.
